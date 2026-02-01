@@ -31,7 +31,8 @@ Every time a trade is executed via `db-trade-execute.sh`:
 Anyone can verify trades by:
 1. Checking git commit timestamps (immutable)
 2. Viewing the JSON audit log
-3. Cross-referencing with broker API
+3. Checking archive.org snapshots (third-party timestamps)
+4. Broker records available for audit on request
 
 ## Files
 
@@ -54,7 +55,7 @@ journalctl -t tiverton-audit --since "1 hour ago"
 
 ## Current Status
 
-- 220 trade events published
 - GitHub repo: https://github.com/mostlydev/tiverton-trades
 - Auto-update: Integrated into trade execution
+- Archive.org: Automatic snapshots after each push
 - Failure mode: Safe (won't break trades if GitHub is down)

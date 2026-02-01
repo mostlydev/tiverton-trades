@@ -47,7 +47,7 @@ Even if someone rewrites git history with `git push --force`, archive.org has pe
 For detailed verification instructions, see [VERIFICATION.md](VERIFICATION.md).
 
 ### Additional Verification
-- Cross-reference with Alpaca Markets API (broker confirmation)
+- Broker records available for audit on request
 - Check Discord #trading-floor posts (real-time announcements)
 - View dashboard: https://www.tivertonhouse.com
 

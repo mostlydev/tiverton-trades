@@ -38,7 +38,7 @@ All trades execute through Alpaca Markets API, which maintains independent recor
 - Account history
 
 **What this prevents:** Fabricating trades entirely
-**How to verify:** Cross-reference trade_id with Alpaca order confirmations
+**How to verify:** Broker records available for audit on request
 
 ### Layer 4: Real-Time Discord Posts
 Trade fills are posted to Discord #trading-floor immediately with Discord's timestamps.
@@ -65,8 +65,8 @@ https://web.archive.org/web/*/https://raw.githubusercontent.com/mostlydev/tivert
 
 Find snapshots dated around the trade timestamp. The trade should appear in snapshots at or after that time, but NOT in earlier snapshots.
 
-### Step 4: Cross-Reference Broker
-If you have API access to Alpaca Markets, look up the order ID from the FILLED event details and confirm it matches.
+### Step 4: Broker Verification (Optional)
+Broker records can be provided for audit on request to verify order IDs and execution details.
 
 ## What This Makes Impossible
 
