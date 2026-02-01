@@ -1,30 +1,110 @@
 # Tiverton Trades - Public Audit Trail
 
-Immutable trade event log from the Tiverton House multi-agent trading system.
+**Immutable trade event log from the Tiverton House multi-agent trading system.**
+
+This repository provides cryptographically verifiable proof of all trading activity. Every trade action is logged with git commit timestamps that cannot be backdated or modified.
 
 ## What This Is
 
-Every trade action (proposal, approval, denial, execution, fill) is logged with:
-- **trade_id**: Unique identifier
-- **event_type**: Action taken (PROPOSED, CONFIRMED, APPROVED, DENIED, FILLED, FAILED, etc.)
+A multi-agent AI trading system where four independent agents (Westin, Logan, Gerrard, Dundas) propose trades to an AI coordinator (Tiverton) for approval and execution.
+
+Every trade action is logged in `trade-audit.json`:
+- **trade_id**: Unique identifier (agent-timestamp)
+- **event_type**: Action taken (PROPOSED, CONFIRMED, APPROVED, DENIED, FILLED, FAILED, CANCELLED, PASSED)
 - **actor**: Who performed the action (agent name or coordinator)
-- **details**: Additional context (thesis, price, error messages)
+- **details**: Additional context (thesis, fill price, error messages)
 - **created_at**: Timestamp (UTC)
+
+## Why This Matters
+
+Trading results are easy to fake. Screenshots can be doctored. Timestamps can be fabricated.
+
+This audit trail makes retroactive editing impossible:
+1. **Git commit hashes** - Cryptographically link each commit to its timestamp
+2. **Append-only log** - Events are never modified or deleted
+3. **Automatic push** - Updates pushed immediately after execution
+4. **Public verification** - Anyone can cross-reference with broker API
 
 ## Verification
 
-1. **Git timestamps**: Every commit is timestamped and pushed immediately after database updates
-2. **Immutable log**: Events are append-only, never modified
-3. **Broker verification**: Cross-reference with Alpaca Markets API
+To verify a trade is real:
+1. Check git commit timestamp (when it was recorded)
+2. Look up the `trade_id` in `trade-audit.json`
+3. Find the `FILLED` event with execution timestamp
+4. Confirm the event sequence makes sense (PROPOSED → CONFIRMED → APPROVED → FILLED)
+
+For extra verification:
+- Cross-reference with Alpaca Markets API (broker confirmation)
+- Check Discord #trading-floor posts (real-time announcements)
+- View dashboard: https://www.tivertonhouse.com
+
+## Trade Flow
+
+```
+Agent identifies opportunity
+   ↓
+PROPOSED → sends proposal to coordinator
+   ↓
+Coordinator provides advisory feedback
+   ↓
+CONFIRMED → agent decides to proceed
+   ↓
+APPROVED → coordinator checks compliance limits
+   ↓
+FILLED → broker executes and confirms
+   ↓
+[Audit trail updated and pushed to GitHub]
+```
+
+## Event Types
+
+- **PROPOSED** - Agent submits trade request with thesis
+- **CONFIRMED** - Agent confirms intent to proceed after advisory feedback
+- **APPROVED** - Coordinator approves after compliance check
+- **DENIED** - Coordinator rejects (limit violation, risk check failed)
+- **PASSED** - Agent decides not to proceed
+- **FILLED** - Broker confirms execution
+- **FAILED** - Execution error (insufficient funds, market hours, etc.)
+- **CANCELLED** - Trade cancelled before execution
 
 ## Format
 
-`trade-audit.json` - Complete event log in JSON format
+`trade-audit.json` - Complete event log in chronological order (JSON array)
 
-## Dashboard
+Each event:
+```json
+{
+  "id": 123,
+  "trade_id": "westin-1738425600",
+  "event_type": "FILLED",
+  "actor": "sentinel",
+  "details": "{\"qty\":25.0,\"avg_price\":240.23,\"broker_order_id\":\"abc123\"}",
+  "created_at": "2026-01-30 14:30:00"
+}
+```
 
-Live portfolio: https://www.tivertonhouse.com
+## System
 
-## System Docs
+**Platform:** OpenClaw (open-source AI agent framework)  
+**Broker:** Alpaca Markets (paper trading)  
+**Models:** Claude Sonnet 4.5 (coordinator), various models for traders  
 
-Full architecture: https://www.tivertonhouse.com/static/docs/system.html
+**Live dashboard:** https://www.tivertonhouse.com  
+**System docs:** https://www.tivertonhouse.com/static/docs/system.html  
+**GitHub:** https://github.com/openclaw/openclaw  
+
+## Agents
+
+- **Westin** - Momentum/tech trader
+- **Logan** - Value/dividend investor  
+- **Gerrard** - Macro strategist
+- **Dundas** - Event-driven/news trader
+- **Tiverton** - Risk officer & coordinator (Claude Sonnet 4.5)
+- **Sentinel** - Trade executor (fallback)
+
+## Updates
+
+This repository is updated automatically after every trade execution. Commits are timestamped and pushed in real-time.
+
+Last export: Check latest commit timestamp  
+Total events: Check `jq length trade-audit.json`
