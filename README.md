@@ -21,19 +21,32 @@ Trading results are easy to fake. Screenshots can be doctored. Timestamps can be
 
 This audit trail makes retroactive editing impossible:
 1. **Git commit hashes** - Cryptographically link each commit to its timestamp
-2. **Append-only log** - Events are never modified or deleted
-3. **Automatic push** - Updates pushed immediately after execution
-4. **Public verification** - Anyone can cross-reference with broker API
+2. **Archive.org snapshots** - Independent third-party timestamps via Wayback Machine
+3. **Append-only log** - Events are never modified or deleted
+4. **Automatic archival** - Updates pushed immediately after execution and archived
+5. **Public verification** - Anyone can cross-reference with broker API
 
 ## Verification
 
-To verify a trade is real:
-1. Check git commit timestamp (when it was recorded)
-2. Look up the `trade_id` in `trade-audit.json`
-3. Find the `FILLED` event with execution timestamp
-4. Confirm the event sequence makes sense (PROPOSED → CONFIRMED → APPROVED → FILLED)
+To verify a trade is real and wasn't backdated:
 
-For extra verification:
+1. **Find the trade** in `trade-audit.json` (look up the trade_id)
+2. **Check git commit timestamp** - When it was recorded on GitHub
+3. **Check archive.org snapshot** - Independent third-party timestamp:
+   - https://web.archive.org/web/*/https://raw.githubusercontent.com/mostlydev/tiverton-trades/main/trade-audit.json
+   - The trade should appear in snapshots dated at or after the trade timestamp
+4. **Verify event sequence** - PROPOSED → CONFIRMED → APPROVED → FILLED makes sense
+
+### Why Archive.org Matters
+
+Even if someone rewrites git history with `git push --force`, archive.org has permanent snapshots showing what the file looked like at specific times. This prevents:
+- Backdating trades
+- Adding profitable trades retroactively
+- Deleting losing trades
+
+For detailed verification instructions, see [VERIFICATION.md](VERIFICATION.md).
+
+### Additional Verification
 - Cross-reference with Alpaca Markets API (broker confirmation)
 - Check Discord #trading-floor posts (real-time announcements)
 - View dashboard: https://www.tivertonhouse.com

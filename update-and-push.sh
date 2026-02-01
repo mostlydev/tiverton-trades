@@ -16,7 +16,13 @@ if ! git diff --quiet trade-audit.json 2>/dev/null; then
     git commit -m "Update: $EVENT_COUNT events ($(date -u +"%Y-%m-%d %H:%M UTC"))" 2>&1 | logger -t tiverton-audit
     
     # Try to push (with timeout, won't block if GitHub is down)
-    timeout 10 git push origin main 2>&1 | logger -t tiverton-audit
+    if timeout 10 git push origin main 2>&1 | logger -t tiverton-audit; then
+        # Push succeeded - submit to archive.org for third-party timestamp
+        # This runs in background so it won't delay anything
+        if [[ -x "$SCRIPT_DIR/archive-to-wayback.sh" ]]; then
+            "$SCRIPT_DIR/archive-to-wayback.sh" &
+        fi
+    fi
     
     # Don't fail if push fails - commit is still saved locally
     # Next successful push will include all commits
