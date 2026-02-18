@@ -8,6 +8,7 @@ README="$SCRIPT_DIR/README.md"
 API_BASE_URL="${API_BASE_URL:-http://localhost:4000}"
 TMP_DIR="$(mktemp -d)"
 AGENTS_JSON="$TMP_DIR/agents.json"
+WALLETS_JSON="$TMP_DIR/wallets.json"
 PERF_ROWS="$TMP_DIR/perf_rows.tsv"
 SECTION_MD="$TMP_DIR/performance_section.md"
 README_NEW="$TMP_DIR/README.new.md"
@@ -18,6 +19,7 @@ cleanup() {
 trap cleanup EXIT
 
 curl -fsS "${API_BASE_URL}/api/v1/agents" > "$AGENTS_JSON"
+curl -fsS "${API_BASE_URL}/api/v1/wallets" > "$WALLETS_JSON"
 
 jq -r '
   .[]
@@ -25,9 +27,7 @@ jq -r '
   | [
       .id,
       .agent_id,
-      .name,
-      (.wallet.wallet_size // "0"),
-      (.wallet.total_value // "0")
+      .name
     ]
   | @tsv
 ' "$AGENTS_JSON" > "$PERF_ROWS"
@@ -36,20 +36,24 @@ jq -r '
     echo "<!-- PERFORMANCE:START -->"
     echo "## Desk Performance Snapshot"
     echo
-    echo "_Auto-generated from Rails API (\`/api/v1/agents\` and \`/api/v1/agents/:id/realized_pnl\`)._"
+    echo "_Auto-generated from Rails API (\`/api/v1/wallets\`, \`/api/v1/agents\`, and \`/api/v1/agents/:id/realized_pnl\`)._"
     echo
-    echo "| Agent | Starting Capital | Equity | Net P&L | Return | Realized P&L | Closed Lots |"
-    echo "|---|---:|---:|---:|---:|---:|---:|"
+    echo "| Agent | Starting Capital | Equity | Net P&L | Return | Realized P&L | Unrealized P&L | Closed Lots |"
+    echo "|---|---:|---:|---:|---:|---:|---:|---:|"
 
     desk_start=0
     desk_equity=0
     desk_realized=0
     desk_closed=0
 
-    while IFS=$'\t' read -r db_id agent_id name wallet_size total_value; do
+    while IFS=$'\t' read -r db_id agent_id name; do
         [[ -z "${db_id:-}" ]] && continue
 
         pnl_json="$(curl -fsS "${API_BASE_URL}/api/v1/agents/${db_id}/realized_pnl" || echo '{}')"
+        wallet_size="$(jq -r --arg a "$agent_id" '.wallets[] | select(.agent_id == $a) | .wallet_size // "0"' "$WALLETS_JSON" | head -n1)"
+        total_value="$(jq -r --arg a "$agent_id" '.wallets[] | select(.agent_id == $a) | .total_value // "0"' "$WALLETS_JSON" | head -n1)"
+        wallet_size="${wallet_size:-0}"
+        total_value="${total_value:-0}"
 
         row="$(jq -n \
           --arg name "$name" \
@@ -79,6 +83,7 @@ jq -r '
         net="$(echo "$row" | jq -r '.net')"
         ret="$(echo "$row" | jq -r '.ret')"
         realized="$(echo "$row" | jq -r '.realized')"
+        unrealized="$(jq -n --argjson n "$net" --argjson r "$realized" '$n - $r')"
         closed="$(echo "$row" | jq -r '.closed')"
 
         desk_start="$(jq -n --argjson a "$desk_start" --argjson b "$start" '$a + $b')"
@@ -86,22 +91,27 @@ jq -r '
         desk_realized="$(jq -n --argjson a "$desk_realized" --argjson b "$realized" '$a + $b')"
         desk_closed="$(jq -n --argjson a "$desk_closed" --argjson b "$closed" '$a + $b')"
 
-        printf "| %s | $%'.2f | $%'.2f | $%'.2f | %.2f%% | $%'.2f | %d |\n" \
-          "$name" "$start" "$equity" "$net" "$ret" "$realized" "$closed"
+        printf "| %s | $%'.2f | $%'.2f | $%'.2f | %.2f%% | $%'.2f | $%'.2f | %d |\n" \
+          "$name" "$start" "$equity" "$net" "$ret" "$realized" "$unrealized" "$closed"
     done < "$PERF_ROWS"
 
     desk_net="$(jq -n --argjson e "$desk_equity" --argjson s "$desk_start" '$e - $s')"
     desk_ret="$(jq -n --argjson n "$desk_net" --argjson s "$desk_start" 'if $s == 0 then 0 else ($n / $s * 100) end')"
 
-    printf "| **Desk Total** | **$%'.2f** | **$%'.2f** | **$%'.2f** | **%.2f%%** | **$%'.2f** | **%d** |\n" \
-      "$desk_start" "$desk_equity" "$desk_net" "$desk_ret" "$desk_realized" "$desk_closed"
+    desk_unrealized="$(jq -n --argjson n "$desk_net" --argjson r "$desk_realized" '$n - $r')"
+    printf "| **Desk Total** | **$%'.2f** | **$%'.2f** | **$%'.2f** | **%.2f%%** | **$%'.2f** | **$%'.2f** | **%d** |\n" \
+      "$desk_start" "$desk_equity" "$desk_net" "$desk_ret" "$desk_realized" "$desk_unrealized" "$desk_closed"
 
     echo
     echo "### Net P&L Chart"
     echo
     echo '```text'
-    while IFS=$'\t' read -r _db_id _agent_id name wallet_size total_value; do
+    while IFS=$'\t' read -r _db_id agent_id name; do
         [[ -z "${name:-}" ]] && continue
+        wallet_size="$(jq -r --arg a "$agent_id" '.wallets[] | select(.agent_id == $a) | .wallet_size // "0"' "$WALLETS_JSON" | head -n1)"
+        total_value="$(jq -r --arg a "$agent_id" '.wallets[] | select(.agent_id == $a) | .total_value // "0"' "$WALLETS_JSON" | head -n1)"
+        wallet_size="${wallet_size:-0}"
+        total_value="${total_value:-0}"
         net="$(jq -n --arg ws "$wallet_size" --arg tv "$total_value" '($tv|tonumber? // 0) - ($ws|tonumber? // 0)')"
         bar="$(awk -v n="$net" 'BEGIN {
             m = (n < 0 ? -n : n);

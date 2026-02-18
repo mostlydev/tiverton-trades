@@ -125,26 +125,26 @@ Total events: Check `jq length trade-audit.json`
 <!-- PERFORMANCE:START -->
 ## Desk Performance Snapshot
 
-_Auto-generated from Rails API (`/api/v1/agents` and `/api/v1/agents/:id/realized_pnl`)._
+_Auto-generated from Rails API (`/api/v1/wallets`, `/api/v1/agents`, and `/api/v1/agents/:id/realized_pnl`)._
 
-| Agent | Starting Capital | Equity | Net P&L | Return | Realized P&L | Closed Lots |
-|---|---:|---:|---:|---:|---:|---:|
-| Boulton | $1,000.00 | $1,000.00 | $0.00 | 0.00% | $-31.35 | 19 |
-| Dundas | $25,000.00 | $24,049.45 | $-950.55 | -3.80% | $-2,443.66 | 18 |
-| Gerrard | $25,000.00 | $25,000.00 | $0.00 | 0.00% | $-1,420.51 | 25 |
-| Logan | $25,000.00 | $25,407.63 | $407.63 | 1.63% | $933.47 | 29 |
-| Westin | $25,000.00 | $45,765.15 | $20,765.15 | 83.06% | $-280.01 | 43 |
-| **Desk Total** | **$101,000.00** | **$121,222.23** | **$20,222.23** | **20.02%** | **$-3,242.06** | **134** |
+| Agent | Starting Capital | Equity | Net P&L | Return | Realized P&L | Unrealized P&L | Closed Lots |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Boulton | $1,000.00 | $967.54 | $-32.46 | -3.25% | $-31.35 | $-1.11 | 19 |
+| Dundas | $25,000.00 | $22,556.35 | $-2,443.65 | -9.77% | $-2,443.66 | $0.01 | 18 |
+| Gerrard | $25,000.00 | $23,579.49 | $-1,420.51 | -5.68% | $-1,420.51 | $0.00 | 25 |
+| Logan | $25,000.00 | $25,933.47 | $933.47 | 3.73% | $933.47 | $0.00 | 29 |
+| Westin | $25,000.00 | $24,719.99 | $-280.01 | -1.12% | $-280.01 | $-0.00 | 43 |
+| **Desk Total** | **$101,000.00** | **$97,756.84** | **$-3,243.16** | **-3.21%** | **$-3,242.06** | **$-1.10** | **134** |
 
 ### Net P&L Chart
 
 ```text
-Boulton  | 0                                         (0.00)
-Dundas   | -###                                      (-950.55)
-Gerrard  | 0                                         (0.00)
-Logan    | +#                                        (407.63)
-Westin   | +######################################## (20,765.15)
+Boulton  | -#                                        (-32.46)
+Dundas   | -#########                                (-2,443.65)
+Gerrard  | -#####                                    (-1,420.51)
+Logan    | +###                                      (933.47)
+Westin   | -#                                        (-280.01)
 ```
 
-_Updated: 2026-02-18 03:05 UTC_
+_Updated: 2026-02-18 03:08 UTC_
 <!-- PERFORMANCE:END -->
