@@ -24,6 +24,6 @@ text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; f
 <rect x="430" y="224" width="123.35" height="18" rx="4" fill="#22c55e"/>
 <text x="892" y="238" class="value">$926.71</text>
 <text x="24" y="292" class="label">Westin</text>
-<rect x="430" y="278" width="121.54" height="18" rx="4" fill="#22c55e"/>
-<text x="892" y="292" class="value">$913.09</text>
+<rect x="430" y="278" width="119.42" height="18" rx="4" fill="#22c55e"/>
+<text x="892" y="292" class="value">$897.18</text>
 </svg>
