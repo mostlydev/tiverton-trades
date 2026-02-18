@@ -7,10 +7,11 @@
 ## Automated Updates
 
 Every time a trade is executed via `db-trade-execute.sh`:
-1. Script exports latest `trade_events` from database to JSON
-2. Commits changes locally with UTC timestamp
-3. Attempts to push to GitHub (with 10-second timeout)
-4. **Never blocks trade execution** - runs in background
+1. Script exports latest `trade_events` from Rails API to `trade-audit.json`
+2. Script regenerates README desk performance snapshot (table + chart)
+3. Commits changes locally with UTC timestamp
+4. Attempts to push to GitHub (with 10-second timeout)
+5. **Never blocks trade execution** - runs in background
 
 ## Resilience Features
 
@@ -23,7 +24,7 @@ Every time a trade is executed via `db-trade-execute.sh`:
 ## What Gets Published
 
 - `trade-audit.json` - Complete append-only event log
-- `README.md` - Public explanation of the system
+- `README.md` - Public explanation + auto-generated desk performance snapshot
 - Automatic git commits with cryptographic timestamps
 
 ## Verification
@@ -36,7 +37,8 @@ Anyone can verify trades by:
 
 ## Files
 
-- `~/tiverton-trades/export-audit.sh` - Export from database
+- `~/tiverton-trades/export-audit.sh` - Export from Rails API
+- `~/tiverton-trades/update-performance.sh` - Update README performance table/chart
 - `~/tiverton-trades/update-and-push.sh` - Commit and push
 - `~/clawd-shared/scripts/db-trade-execute.sh` - Calls update script after execution
 
@@ -57,5 +59,6 @@ journalctl -t tiverton-audit --since "1 hour ago"
 
 - GitHub repo: https://github.com/mostlydev/tiverton-trades
 - Auto-update: Integrated into trade execution
+- Fallback schedule: `Tiverton Audit Export` cron every 5 minutes
 - Archive.org: Automatic snapshots after each push
 - Failure mode: Safe (won't break trades if GitHub is down)

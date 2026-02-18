@@ -45,9 +45,10 @@ cd ~/tiverton-trades
 ```
 
 This will:
-1. Export latest trade_events from database
-2. Commit changes with timestamp
-3. Push to GitHub
+1. Export latest trade events from Rails API to `trade-audit.json`
+2. Regenerate README desk performance snapshot (table + chart)
+3. Commit changes with timestamp
+4. Push to GitHub
 
 ## 5. Integrate with Trade Execution
 
@@ -60,11 +61,25 @@ Add to the end of `~/clawd-shared/scripts/db-trade-execute.sh`:
 
 This pushes the audit trail immediately after every trade execution.
 
+## 6. Optional Fallback Scheduler
+
+If fills are executed asynchronously (for example via Rails/Sidekiq) and may bypass `db-trade-execute.sh`, add a periodic OpenClaw job:
+
+```json
+{
+  "name": "Tiverton Audit Export",
+  "schedule": { "kind": "cron", "expr": "*/5 * * * *", "tz": "America/New_York" },
+  "sessionTarget": "isolated",
+  "payload": { "kind": "agentTurn", "message": "Run: ~/tiverton-trades/update-and-push.sh" }
+}
+```
+
 ## What Gets Published
 
 - `trade-audit.json` - Complete event log (append-only)
-- `README.md` - Explanation of the audit system
-- `export-audit.sh` - Script to export from database
+- `README.md` - Audit explanation + auto-generated desk performance snapshot
+- `export-audit.sh` - Script to export from Rails API
+- `update-performance.sh` - Script to build the performance section in README
 
 ## Verification
 

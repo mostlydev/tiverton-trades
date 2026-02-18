@@ -80,16 +80,19 @@ Broker records can be provided for audit on request to verify order IDs and exec
 
 After each trade execution:
 ```bash
-# 1. Export trade events to JSON
+# 1. Export trade events from Rails API to JSON
 export-audit.sh
 
-# 2. Commit with timestamp
+# 2. Refresh README performance snapshot (table + chart)
+update-performance.sh
+
+# 3. Commit with timestamp
 git commit -m "Update: 220 events (2026-02-01 18:30 UTC)"
 
-# 3. Push to GitHub
+# 4. Push to GitHub
 git push origin main
 
-# 4. Submit to archive.org (runs in background)
+# 5. Submit to archive.org (runs in background)
 curl "https://web.archive.org/save/https://raw.githubusercontent.com/mostlydev/tiverton-trades/main/trade-audit.json"
 ```
 

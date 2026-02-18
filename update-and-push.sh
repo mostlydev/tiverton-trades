@@ -8,10 +8,16 @@ cd "$SCRIPT_DIR" || exit 1
 # Export latest trade events
 ./export-audit.sh 2>&1 | logger -t tiverton-audit
 
+# Refresh performance table/chart in README (API-backed)
+if [[ -x "$SCRIPT_DIR/update-performance.sh" ]]; then
+    "$SCRIPT_DIR/update-performance.sh" 2>&1 | logger -t tiverton-audit || \
+        logger -t tiverton-audit "Warning: update-performance.sh failed"
+fi
+
 # Check if there are changes
-if ! git diff --quiet trade-audit.json 2>/dev/null; then
+if ! git diff --quiet trade-audit.json README.md 2>/dev/null; then
     # Commit locally (this always succeeds)
-    git add trade-audit.json 2>&1 | logger -t tiverton-audit
+    git add trade-audit.json README.md 2>&1 | logger -t tiverton-audit
     EVENT_COUNT=$(jq length trade-audit.json 2>/dev/null || echo "unknown")
     git commit -m "Update: $EVENT_COUNT events ($(date -u +"%Y-%m-%d %H:%M UTC"))" 2>&1 | logger -t tiverton-audit
     
