@@ -138,13 +138,7 @@ _Auto-generated from Rails API (`/api/v1/wallets`, `/api/v1/agents`, and `/api/v
 
 ### Net P&L Chart
 
-```text
-Boulton  | -#                                        (-464.17)
-Dundas   | -########                                 (-2,175.30)
-Gerrard  | -###                                      (-945.05)
-Logan    | +######                                   (1,614.19)
-Westin   | +#########                                (2,276.05)
-```
+![Desk Net P&L](performance-chart.svg)
 
-_Updated: 2026-02-18 03:10 UTC_
+_Updated: 2026-02-18 03:13 UTC_
 <!-- PERFORMANCE:END -->
