@@ -140,5 +140,5 @@ _Auto-generated from Rails API (`/api/v1/wallets`, `/api/v1/agents`, and `/api/v
 
 ![Desk Net P&L](performance-chart.svg)
 
-_Updated: 2026-02-21 09:00 UTC_
+_Updated: 2026-02-21 09:06 UTC_
 <!-- PERFORMANCE:END -->
