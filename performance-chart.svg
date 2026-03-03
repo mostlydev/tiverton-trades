@@ -18,8 +18,8 @@ text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; f
 <rect x="150.00" y="116" width="280.00" height="18" rx="4" fill="#ef4444"/>
 <text x="892" y="130" class="value">$-2,103.56</text>
 <text x="24" y="184" class="label">Gerrard</text>
-<rect x="249.75" y="170" width="180.25" height="18" rx="4" fill="#ef4444"/>
-<text x="892" y="184" class="value">$-1,354.16</text>
+<rect x="250.29" y="170" width="179.71" height="18" rx="4" fill="#ef4444"/>
+<text x="892" y="184" class="value">$-1,350.11</text>
 <text x="24" y="238" class="label">Logan</text>
 <rect x="430" y="224" width="136.23" height="18" rx="4" fill="#22c55e"/>
 <text x="892" y="238" class="value">$1,023.44</text>
